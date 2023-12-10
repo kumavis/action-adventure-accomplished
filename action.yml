@@ -19,7 +19,7 @@ inputs:
     description: "The number of the pull request for which the image is being generated."
     required: true
 runs:
-  using: "node16"
+  using: "node18"
   main: "./src/index.js"
 branding:
   icon: "magic-wand"
