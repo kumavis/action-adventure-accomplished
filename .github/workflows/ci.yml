@@ -2,7 +2,7 @@ name: Fantasy Image Creation on PR Merge
 
 on:
   pull_request:
-    types: [closed]
+    types: [opened, closed]
 
 jobs:
   create-and-post-image:
