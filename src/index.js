@@ -7,7 +7,7 @@ const fantasyTheme = core.getInput('FANTASY_THEME', { required: false }) || 'wiz
 const imageStyle = core.getInput('IMAGE_STYLE', { required: false }) || 'artistic';
 const prNumber = core.getInput('PULL_REQUEST_NUMBER', { required: true });
 
-const octokit = new Octokit({ auth: githubToken });
+const octokit = new Octokit({ auth: githubToken, request: { fetch } });
 
 // Assuming these environment variables are set in your GitHub Actions workflow
 // const owner = process.env.GITHUB_REPOSITORY_OWNER;
