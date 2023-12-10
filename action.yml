@@ -1,0 +1,26 @@
+name: "Fantasy Image Generation Action"
+description: "Generates a fantasy-themed image based on PR content and comments on the PR using ChatGPT or DALL-E API."
+inputs:
+  GITHUB_TOKEN:
+    description: "GitHub token to interact with the repository."
+    required: true
+  OPENAI_API_KEY:
+    description: "OpenAI API key for accessing DALL-E or ChatGPT services."
+    required: true
+  FANTASY_THEME:
+    description: "The fantasy theme or setting to be used for the image generation."
+    required: false
+    default: "wizard adventure"
+  IMAGE_STYLE:
+    description: "Style or type of the image to be generated."
+    required: false
+    default: "artistic"
+  PULL_REQUEST_NUMBER:
+    description: "The number of the pull request for which the image is being generated."
+    required: true
+runs:
+  using: "node16"
+  main: "index.js"
+branding:
+  icon: "magic-wand"
+  color: "purple"

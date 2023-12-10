@@ -1,0 +1,30 @@
+name: Fantasy Image Creation on PR Merge
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  create-and-post-image:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Adventure Time!
+        uses: ./  # Path to your action
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          FANTASY_THEME: "wizard adventure"
+          IMAGE_STYLE: "artistic"
+          PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
