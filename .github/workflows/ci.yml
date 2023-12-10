@@ -4,9 +4,6 @@ on:
   pull_request:
     types: [opened, closed]
 
-permissions:
-  issues: write
-
 jobs:
   create-and-post-image:
     # if: github.event.pull_request.merged == true
@@ -32,6 +29,7 @@ jobs:
         uses: ./  # Path to your action
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_COMMENT_TOKEN: ${{ secrets.GH_COMMENT_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           FANTASY_THEME: "bard adventure"
           IMAGE_STYLE: "fantasy painting"

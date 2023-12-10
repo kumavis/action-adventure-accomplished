@@ -2,6 +2,7 @@ const core = require('@actions/core');
 const { Octokit } = require("@octokit/core");
 
 const githubToken = core.getInput('GITHUB_TOKEN', { required: true });
+const githubCommentToken = core.getInput('GITHUB_COMMENT_TOKEN', { required: true });
 const openaiApiKey = core.getInput('OPENAI_API_KEY', { required: true });
 const fantasyTheme = core.getInput('FANTASY_THEME', { required: false }) || 'wizard adventure';
 const imageStyle = core.getInput('IMAGE_STYLE', { required: false }) || 'artistic';
@@ -141,6 +142,7 @@ async function postComment(prNumber, imageUrl, prompt) {
     // Construct the comment body with the image and its alt text
     const commentBody = `![${prompt.replaceAll('\n', '\\n')}](${imageUrl})`;
 
+    const octokit = new Octokit({ auth: githubCommentToken, request: { fetch } });
     await octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', {
       owner,
       repo,
