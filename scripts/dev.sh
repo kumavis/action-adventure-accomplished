@@ -6,4 +6,4 @@ if [ -f .env ]; then
 fi
 
 # Run the Node.js script
-node ./src/main.js
+node ./src/index.js
