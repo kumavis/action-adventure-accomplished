@@ -27,4 +27,4 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           FANTASY_THEME: "bard adventure"
           IMAGE_STYLE: "fantasy painting"
-          PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
+          PULL_REQUEST_NUMBER: ${{ github.event.number }}
