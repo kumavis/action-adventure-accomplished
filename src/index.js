@@ -1,10 +1,18 @@
+const core = require('@actions/core');
 const { Octokit } = require("@octokit/core");
 
-const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+const githubToken = core.getInput('GITHUB_TOKEN', { required: true });
+const openaiApiKey = core.getInput('OPENAI_API_KEY', { required: true });
+const fantasyTheme = core.getInput('FANTASY_THEME', { required: false }) || 'wizard adventure';
+const imageStyle = core.getInput('IMAGE_STYLE', { required: false }) || 'artistic';
+const prNumber = core.getInput('PULL_REQUEST_NUMBER', { required: true });
+
+const octokit = new Octokit({ auth: githubToken });
 
 // Assuming these environment variables are set in your GitHub Actions workflow
 // const owner = process.env.GITHUB_REPOSITORY_OWNER;
 const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
+console.log(`Owner: ${owner}, Repo: ${repo}`);
 
 /**
  * Fetches comments or commit messages from a merged PR.
@@ -50,7 +58,7 @@ async function fetchPRContent(prNumber) {
  */
 async function generateImage(prompt) {
   const openAIEndpoint = 'https://api.openai.com/v1/images/generations';
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = openaiApiKey;
 
   try {
     const payload = {
@@ -86,10 +94,7 @@ async function generateImage(prompt) {
  */
 async function createPrompt(prContent) {
     const openAIEndpoint = 'https://api.openai.com/v1/engines/gpt-3.5-turbo-instruct/completions';
-    const apiKey = process.env.OPENAI_API_KEY;
-
-    const fantasyTheme = process.env.FANTASY_THEME || 'wizard adventure';
-    const imageStyle = process.env.IMAGE_STYLE || 'artistic';
+    const apiKey = openaiApiKey;
 
     // Construct the input for the prompt
     const prompt = `Generate a creative image description for a fantasy-themed image. The theme is "${fantasyTheme}", the style is "${imageStyle}", and it should relate to the following pull request content: "${prContent}"`;
@@ -152,7 +157,6 @@ async function postComment(prNumber, imageUrl, prompt) {
 
 async function main() {
   try {
-      const prNumber = process.env.PULL_REQUEST_NUMBER;
 
       if (!prNumber) {
         throw new Error('Pull Request number is not provided.');
