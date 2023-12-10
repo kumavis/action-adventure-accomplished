@@ -6,7 +6,6 @@ const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 // const owner = process.env.GITHUB_REPOSITORY_OWNER;
 const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
 
-
 /**
  * Fetches comments or commit messages from a merged PR.
  * @param {number} prNumber - The number of the pull request.
@@ -56,6 +55,7 @@ async function generateImage(prompt) {
   try {
     const payload = {
       prompt, // The content string derived from PR
+      model: 'dall-e-3',
     };
 
     const response = await fetch(openAIEndpoint, {
@@ -68,6 +68,7 @@ async function generateImage(prompt) {
     });
 
     const data = await response.json();
+    // console.log('Image generation response:\n', data);
     const imageUrl = data.data[0].url;
 
     return imageUrl;
@@ -92,7 +93,8 @@ async function createPrompt(prContent) {
 
     // Construct the input for the prompt
     const prompt = `Generate a creative image description for a fantasy-themed image. The theme is "${fantasyTheme}", the style is "${imageStyle}", and it should relate to the following pull request content: "${prContent}"`;
-    console.log('MetaPrompt:\n', prompt);
+    const truncatedPrompt = prompt.substring(0, 1000);
+    // console.log('MetaPrompt:\n', truncatedPrompt);
 
     try {
         const response = await fetch(openAIEndpoint, {
@@ -102,7 +104,7 @@ async function createPrompt(prContent) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                prompt: prompt,
+                prompt: truncatedPrompt,
                 max_tokens: 200, // Adjust as necessary
                 temperature: 0.7 // Adjust for creativity
             })
@@ -111,8 +113,9 @@ async function createPrompt(prContent) {
         const data = await response.json();
 
         // Extract the generated prompt
+        // console.log('Prompt generation response:\n', data);
         const generatedPrompt = data.choices[0].text.trim();
-        console.log('Prompt:\n', generatedPrompt);
+        // console.log('Prompt:\n', generatedPrompt);
 
 
         return generatedPrompt;
@@ -122,15 +125,16 @@ async function createPrompt(prContent) {
     }
 }
 
-
 /**
- * Posts the generated image URL as a comment on the PR.
+ * Posts the generated image URL as a comment on the PR with the prompt as alt text.
  * @param {number} prNumber - The number of the pull request.
  * @param {string} imageUrl - URL of the generated image.
+ * @param {string} prompt - The prompt used to generate the image.
  */
-async function postComment(prNumber, imageUrl) {
+async function postComment(prNumber, imageUrl, prompt) {
   try {
-    const commentBody = `![Generated Image](${imageUrl})`;
+    // Construct the comment body with the image and its alt text
+    const commentBody = `![${prompt.replaceAll('\n', '\\n')}](${imageUrl})`;
 
     await octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', {
       owner,
@@ -173,7 +177,7 @@ async function main() {
       }
 
       // Post the generated image URL as a comment on the PR
-      await postComment(prNumber, imageUrl);
+      await postComment(prNumber, imageUrl, imagePrompt);
       console.log('Image posted successfully.');
 
   } catch (error) {
